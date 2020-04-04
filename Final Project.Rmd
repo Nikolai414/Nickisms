@@ -1,0 +1,406 @@
+---
+title: 'Atlantic cod (Gadus morhua) described temporally and spatially'
+author: "Nicholas Tucker"
+date: "3 April 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+  The Atlantic cod (Gadus morhua) is a notable commercially important species. It has been fished since 985 C.E. and can be found anywhere between 30°N to 80°N (Kurlansky 1997; Link et al. 2009). In Georges Bank, they have been harvested since the 1600s and continued to be a heavy influence in American fisheries until a moratorium was called in 1992 (Serchuk and Wigley 1992; Lambert and Dutil 1997). The advent of the Industrial Revolution meant that cod did not have to be fished using handline and longline methods. Instead, large steamboats or diesel- powered vessels towing otter trawls caught anywhere from 20,000 mt to 100,000 mt each year (Serchuk and Wigley 1992). The combination of modern fishing equipment, poorly estimated stock levels, and environmental changes have led to overall declines in the size of catches that commercial and recreational fisherman can harvest (Link et al. 2009).
+Atlantic cod are managed by the New England Fishery Management Council and the National Oceanic and Atmospheric Administration  under the Northeast Multispecies Fishery Management Plan. They are managed alongside 12 other groundfish species and have been since 1977. Georges Bank is further co-managed with two other stock areas  in an agreement between the United States and Canada (https://www.fisheries.noaa.gov/species/northeast-multispecies-groundfish).  
+	In this assessment, I will be considering two environmental parameters that have likely  influenced the Georges Bank stock decline or at a minimum is inhibiting its recovery. Salinity and temperature play a significant role in most fish species given their interaction with thermoregulation and osmoregulation. These fish are described as a batch spawner (McEvoy and McEvoy 1992). Spawning takes place offshore in temperatures between 0 and 12°C in low haline conditions (Cohen et al. 1990).  These low haline conditions are important for reducing egg and larval mortality as the reduced density increases the probability that the egg will be neutrally buoyant. 
+  In adult Atlantic cod, temperature tolerance is relatively high given their vast distribution and migration paths (Howell et al. 2008). However, during larval stages low water temperatures will constrain growth (Suthers and Sundby, 1993). These larvae are planktonic until they reach approximately 70 days in which they will settle in cobbles (Cohen et al. 1990).  
+  Identifying the spatial and temporal trends that occur in Georges Bank may elucidate the stock dynamics that we observe. Thus, a time series analysis with an autoregressive integrated moving average (ARIMA) will be used with environmental parameters as explanatory variables. Furthermore, a species distribution model was generated to identify suitable habitat for Atlantic cod. 
+
+  
+# Methods
+  The World Ocean Database has data sets reaching back to the early 1800s until today. In order to compare annual landings to environmental parameters, I reduced my sampling between the time period: 1902 to 2018. I have also verified the commercial landings against the paper produced by Meng et al. (2016) (the additional two years, 2017-2018, come directly from the Northeast Fisheries Science Council (NEFSC) database). The geographic search terms I used focused on Georges Bank (Figure 1) since it is the most affected by overfishing. 
+  After cleaning and processing the dataset, I divided it into two sections. In the first dataset, I focused on generating a time series analysis describing the weight of Atlantic cod landings between 1902 and 2018. Data were decomposed to separate the different components attributed by seasonality, trends  or errors. The data were then tested for stationarity using an augmented Dickey-Fuller test (ADF). After testing for autocorrelation, four ARIMA models were performed. Finally, models that met the assumptions for a time series analysis had a forecast was generated 10 and 25 years into the future. 
+	In the second dataset, I conducted a species distribution model to determine suitable habitat for Atlantic cod dependent on two environmental parameters. Using the dataset I found on the World Ocean Database and marine chemistry parameter database that I found specifically for species distribution models for marine environments in R (Bio-Oracle), I determined the geographic extent of my dataset and compared it to pseudo-absence data I generated. I then trained and tested my model ro assess its performance. These data resulted in a species distribution which indicates suitability of an area for Atlantic Cod based on two environmental parameters (temperature and salinity). 
+
+```{r figure0, echo=FALSE,  out.width = '100%'}
+knitr::include_graphics("C:/Users/nikol/Desktop/GBnorthup.jpeg")
+```
+
+
+# Results
+#### Time Series Analysis
+  This century of catch data indicates a generally negative trend (Figure 2) as the time progresses. The commercial landings are as little as 800 mt, by the end of the series. This is much smaller than the maximum recorded catch of 17959 mt. 
+	In order to satisfy the two assumptions for an ARIMA based time series analysis, the stationarity of the series was tested using an Augmented Dickey-Fuller test. The p-value was 0.2411m which indicates stationarity. Two autocorrelation plots were generated (autocorrelation plot and partial autocorrelation plot, Figure 3) with a lag of 25 years (Atlantic cod lifespan). Although there were significant autocorrelations with many lags in the ACF plot, the partial autocorrelation plot indicated that these may be vestigial correlation from earlier lags since there were only certain locations with lag-spikes.  
+	After conducting the ARIMA and inspecting the residuals for white noise, a Ljung-Box test indicated that this series was independent since the p-value was 0.38 (Figure 4). Once I finished calculating the residuals and independence, I forecasted into the future 10 years to determine what the landings could look like, the results are found in Figure 5. 
+	The second ARIMA was performed on temperature overall and indicated stationarity and independence. The third was performed on the “inhospitable temperature”, in other words, the temperature above the threshold for sustaining Atlantic cod. The AIC results are in Table 1. 
+	A fourth ARIMA was attempted on salinity. Initially, it failed the Dickey Fuller test, but after applying the function diff(), I was able to generate a p-value <0.01. Furthermore, the Ljung-box test indicated that salinity based time series was independent as well.
+	
+#### Species Distribution Model
+  Of the 116 years of data, 10 years did not have complete records. Since the data still included latitude and longitude for observations, I did not remove them from my dataset. Each observation plotted spatially represent approximately five spawning ground areas. 91.8% of these spawning grounds have Atlantic cod in a state of ripe (pre-spawn), running (mid-spawn), and spent (post-spawn).
+  When developing pseudo-absence points for the model, approximately 20% of the data were set asdie to train a new model. These results are perfunctorily visual and can be seen in Figure 6. 
+  
+```{r table, echo=FALSE,  out.width = '50%'}
+knitr::include_graphics("C:/Users/nikol/Desktop/Table_1.png")
+```
+
+```{r figure1, echo=FALSE,  out.width = '75%'}
+knitr::include_graphics("C:/Users/nikol/Desktop/Time_Series_Figure.2.jpeg")
+```
+Figure 2
+```{r figure3, echo=FALSE,  out.width = '75%'}
+knitr::include_graphics("C:/Users/nikol/Desktop/set2.png")
+```
+
+```{r figure5, echo=FALSE,  out.width = '75%'}
+knitr::include_graphics("C:/Users/nikol/Desktop/forecast.jpeg")
+```
+Figure 5
+```{r figure6, echo=FALSE,  out.width = '75%'}
+knitr::include_graphics("C:/Users/nikol/Desktop/SDM_Cod.jpeg")
+```
+Figure 6
+
+
+# Discussion
+  Species distribution models are especially important for determining the reaction organisms may have to current and future environmental changes. These results indicate that environemental parameters such as temperature and salinity can have a great impact on the abundance and distribution of commercially important fish. 
+  Recovering there numbers is well within reason (ARIMA forecast for landings). It just depends on how we monitor fish stocks and limit our contribution to global climate change. One of the methods we can use to sustainably monitor these fish stocks is via the use of scientific echosounders. These sophisticated sonars are capable of monitoring large swathes of ocean without doing any harm to the fish under water. 
+  If I were to improve on these analysis, I would like do a more discrete time gap, but with higher discretion per year. Given the migratory tendencies of Atlantic cod, there were likely be seasonality in abundance, especially in Georges Bank. This type of analysis has the potential to indicate what time of year Atlantic cod are the most vulnerable to environmental conditions. 
+  
+  
+# References
+Cohen, D.M., T. Inada, T. Iwamoto and N. Scialabba, 1990. FAO species catalogue. Vol. 10. Gadiform fishes of the world (Order Gadiformes). An annotated and illustrated catalogue of cods, hakes, grenadiers and other gadiform fishes known to date. FAO Fish. Synop. 125(10). Rome: FAO. 442 p.
+
+Howell WH, Morin M, Rennels N & Goethel D (2008) Residency of adult Atlantic cod (Gadus morhua) in the western Gulf of Maine. Fisheries Research 91:123–132.
+
+Kurlansky M (2011) Cod: A biography of the fish that changed the world. Vintage Canada.
+
+Lambert Y & Dutil JD (1997) Condition and energy reserves of Atlantic cod (Gadus morhua) during the collapse of the northern Gulf of St. Lawrence stock. Canadian Journal of Fisheries and Aquatic Sciences 54:2388–2400.
+
+Link JS, Bogstad B, Sparholt H & Lilly GR (2009) Trophic role of Atlantic cod in the ecosystem. 58–87.
+
+McEvoy, LA and J McEvoy, 1992. Multiple spawning in several commercial fish species and its consequences for fisheries management, cultivation and experimentation. J. Fish Biol. 41(Suppl.B):125-136.
+
+Northeast Fisheries Science Center.NOAA. https://www.fisheries.noaa.gov/species/northeast-multispecies-groundfish. Accessed 27Feb2020. 
+Serchuk, FM, R Mayo, L O'brien, S Wigley. 1992. Assessment of Georges Bank cod stock for 1992. 
+
+World Ocean Database. NOAA. https://www.nodc.noaa.gov/OC5/SELECT/dbsearch/dbsearch.html. Accessed 15Feb2020..
+
+
+
+```{r lmfao, eval=FALSE, include=FALSE}
+library(zoo)
+library(tseries)
+library(forecast)
+library(xts)
+
+# since this data were cleaned (extensively!!!) to an annual trend, I have already "decomposed" the data and removed any potential seasonal components
+cod_1902.2018 <- read.csv("C:/Users/nikol/Desktop/Class/2020Spring/Quantitative-Ecology/Historic_Data/Data Sets Used for modelling/cod_1902.2017.csv")
+#Time Series Analysis
+{
+land.mt <- ts(cod_1902.2018$Land_mt, start =1, frequency = 1)
+par(mfrow=c(1,1), mai=c(0.25,0.8,0.1,0.1))
+plot( land.mt, typ="l", 
+      ylab= "Weight (mt)", main = "Atlantic cod commerical landings")                             
+lines(tsclean(land.mt), col = "blue")
+
+max(cod_1902.2018$Land_mt)
+#Assumption 1: test for stationarity
+##p-value < 0.05 indicates the Time Series is stationary
+adf.test(land.mt)
+
+#Developing autocorrelation plots- lag max was determined by the length of A.cod lifespan (25 years). 
+par(mfrow=c(2,1))
+acf(land.mt, lag.max= 25, main="ACF landings")
+pacf(land.mt, lag.max = 25, main = "PACF landings")
+
+# Fitting the ARIMA model
+arima.land.mt1 <- auto.arima(land.mt, trace =T)
+
+tsdisplay(residuals(arima.land.mt1), lag.max=25, main = "ARIMA residuals for cod landings") # Works great! everything falls within the bounds meaning there are no significant correlations present. 
+
+AIC(arima.land.mt1)
+  #2144.029
+
+par(mfrow=c(1,1))
+plot(land.mt, typ="l"); lines(fitted(arima.land.mt1), col = "blue")
+
+
+#Test for independence:
+checkresiduals(arima.land.mt1, lag = 20)
+#p-value is greater than 0.05 so this is independent
+
+#forecast metric tonnage 10 years into the future. 
+par(mfrow=c(2,1))
+plot(forecast(arima.land.mt1, h = 10))
+plot(forecast(arima.land.mt1, h = 25))
+#plot(forecast(arima.land.mt1, h = 50))
+
+# Creating a time series object
+temp <- ts(cod_1902.2018$Temp.avg.C, start =1, frequency = 1)
+
+par(mfrow=c(1,1), mai = c(0.3, 0.8, 0.1,0.1))
+plot(temp, typ = "l", ylab="Temperature (C)", xlab = "")
+
+# remove outliers
+plot(temp, typ = "l", ylab="Temperature (C)", xlab = "")
+lines(tsclean(temp),col = "orange")
+
+temp <- tsclean(temp)
+
+# Again, not going to "decompose" since this is on an annual basis and there are not periods visible here. 
+
+#test for stationarity
+adf.test(temp)
+#p-value is less than 0.05
+
+# look for significant lags
+ccf(diff(temp), land.mt, na.action = na.pass, lag.max = 30, plot = T)
+# no significant correlation in this graph!
+
+#fit an arima
+arima.land.mt2_T <- auto.arima(land.mt, xreg=c(diff(temp),0), trace = TRUE)
+
+# Check index for model comparison:
+AIC(arima.land.mt1, arima.land.mt2_T)
+# The first model was better but the difference is fairly small. 
+
+# consider extreme temperatures (especially since eggs are only viable between [0.5 -10.3])
+temp.i <- temp
+temp.i[temp.i > 10.3] <- 0
+temp.i[temp.i >= 30] <- 1
+
+arima.land.mt3_Ti <- auto.arima(land.mt, xreg = temp.i, trace = T)
+
+AIC(arima.land.mt1, arima.land.mt3_Ti)
+# barely made any differenece, it looks like even extreme temperatures are not playing as much of a role on eggs. 
+
+checkresiduals(arima.land.mt3_Ti, lag = 20)
+# still above 0.05 so it's independent. 
+
+par(mfrow = c(1,1))
+plot(land.mt, typ = "l"); lines(fitted(arima.land.mt3_Ti), col = "red")
+
+# Repeat with Salinity
+
+sal <- ts(cod_1902.2018$Sal.avg.PSS, start =1, frequency = 1)
+par(mfrow=c(1,1), mai = c(0.3, 0.8, 0.1,0.1))
+plot(sal, typ = "l", ylab="Salinity (PSS)", xlab = "")
+
+# remove outliers
+plot(sal, typ = "l", ylab="Salinity (PSS)", xlab = "")
+lines(tsclean(sal),col = "orange")
+
+sal <- tsclean(sal)
+
+# Again, not going to "decompose" since this is on an annual basis and there are not periods visible here. 
+
+#test for stationarity
+adf.test(diff(sal))
+#p-value is less than 0.05
+
+# look for significant lags
+ccf(diff(sal), land.mt, na.action = na.pass, lag.max = 30, plot = T)
+# no significant correlation in this graph!
+
+#fit an arima
+arima.land.mt4_S <- auto.arima(land.mt, xreg=c(diff(sal),0), trace = TRUE)
+
+# Check index for model comparison:
+AIC(arima.land.mt1, arima.land.mt4_S)
+# The first model was better but the difference is fairly small. 
+
+# consider extreme temperatures (especially since eggs are only viable between [0.5 -10.3])
+sal.i <- 
+sal.i[sal.i < 10.3] <- 0
+sal.i[sal.i >= 25] <- 1
+
+arima.land.mt3_Ti <- auto.arima(land.mt, xreg = sal.i, trace = T)
+
+AIC(arima.land.mt1, arima.land.mt3_Ti)
+# barely made any differenece, it looks like even extreme temperatures are not playing as much of a role on eggs. 
+
+checkresiduals(arima.land.mt4_S, lag = 20)
+# still above 0.05 so it's independent. 
+
+par(mfrow = c(1,1))
+plot(land.mt, typ = "l"); lines(fitted(arima.land.mt3_Ti), col = "purple")
+
+
+}
+
+#Species Distribution Model
+Cod_Dist <- read.csv("C:/Users/nikol/Desktop/Class/2020Spring/Quantitative-Ecology/Historic_Data/Data Sets Used for modelling/Cod_Dist.csv")
+
+library("sp")
+library("raster")
+library("maptools")
+library("rgdal")
+library("dismo")
+library("marmap")
+library("sdmpredictors")
+# Check the data to make sure it loaded correctly
+summary(Cod_Dist)
+
+
+max.lat <- ceiling(max(Cod_Dist$Lat))
+min.lat <- floor(min(Cod_Dist$Lat))
+max.lon <- ceiling(max(Cod_Dist$Long))
+min.lon <- floor(min(Cod_Dist$Long))
+geographic.extent <- extent(x = c(min.lon, max.lon, min.lat, max.lat))
+
+
+
+Cod.dist.map <- getNOAA.bathy(lon1 = min.lon-1, lon2 = max.lon+1,
+                        lat1 = min.lat-1, lat2 = max.lat+1, resolution = 1)
+
+colorramp<- colorRampPalette(c("purple", "darkblue", "lightblue", "white"))
+
+par(mfrow=c(1,1), mai = c(0.9, 0.8, 0.3,0.3))
+plot(Cod.dist.map, 
+     lwd = 0.1,
+     bpal =  colorramp(50),
+     image = TRUE)
+scaleBathy(Cod.dist.map, deg = 2, x = "topleft", inset = 5)
+# Add the points for individual observation
+points(x = Cod_Dist$Long, 
+       y = Cod_Dist$Lat, 
+       col = "orange", 
+       pch = 20, 
+       cex = 0.75)
+
+# And draw a little box around the graph
+box()
+
+
+
+###Building a model and visualizing results
+
+
+datasets<- list_datasets(terrestrial= FALSE, marine = TRUE)
+layers <- list_layers(datasets)
+#Temperature Bio-ORACLE	BO2_tempmean_bdmean	Sea water temperature (mean at mean depth)	Mean sea water temperature at the bottom at mean bottom d
+#Salinity Bio-ORACLE	BO2_salinitymean_bdmean	Sea water salinity (mean at mean depth)
+{load_layers(layers[layers$name %in% c("Sea water temperature (mean at mean depth)", 
+                                      "Sea water salinity (mean at mean depth)") & 
+                      layers$dataset_code == "Bio-ORACLE",], datadir = ("C:/Users/nikol/Desktop/Class/2020Spring/Quantitative-Ecology/Historic_Data/update as of 1Apr/"))
+}
+layercodes <- c("BO2_tempmean_bdmean", "BO2_salinitymean_bdmean")
+
+env<- load_layers(layercodes, equalarea= F, datadir= ("C:/Users/nikol/Desktop/Class/2020Spring/Quantitative-Ecology/Historic_Data/update as of 1Apr/"))
+
+
+# Build species distribution model
+Lat.Long <- data.frame(Cod_Dist$Long, Cod_Dist$Lat)
+sdm.data <- crop(x = env, y = geographic.extent)
+
+bc.model <- bioclim(x = sdm.data, p = Lat.Long)
+
+# Predict presence from model
+predict.presence <- dismo::predict(object = bc.model, x = env, ext = geographic.extent)
+
+
+par(mfrow=c(1,1), mai = c(0.9, 0.8, 0.3,0.3))
+plot(Cod.dist.map, 
+     lwd = 0.1,
+     bpal =  colorramp(50),
+     image = TRUE)
+scaleBathy(Cod.dist.map, deg = 2, x = "topleft", inset = 5)
+# Add the points for individual observation
+points(x = Cod_Dist$Long, 
+       y = Cod_Dist$Lat, 
+       col = "orange", 
+       pch = 20, 
+       cex = 0.75)
+box()
+
+# Add model probabilities
+library("maptools")
+data(wrld_simpl)
+
+plot(wrld_simpl, xlim= c(min.lon-1, max.lon+1),
+     ylim= c(min.lat-1,max.lat+1), axes = T, col = "Green")
+
+colorramp.2 <- colorRampPalette(c("darkred", "red", "purple", "pink", "white"))
+plot(predict.presence, add = TRUE, bpal = colorramp.2(5))
+points(x = Cod_Dist$Long, 
+       y = Cod_Dist$Lat, 
+       col = "purple", 
+       pch = 20, 
+       cex = 0.75)
+box()
+
+#psuedo absence points were generated with another program.
+Pseudo.Absence <- read.csv("C:/Users/nikol/Desktop/Class/2020Spring/Quantitative-Ecology/Historic_Data/Data Sets Used for modelling/Pseudo.Absence.csv")
+
+
+par(mfrow=c(1,1), mai = c(0.9, 0.8, 0.3,0.3))
+plot(Cod.dist.map, 
+     lwd = 0.1,
+     bpal =  colorramp(50),
+     image = TRUE)
+scaleBathy(Cod.dist.map, deg = 2, x = "topleft", inset = 5, main = "Presence and Pseudo-absence Points")
+# Add the points for individual observation
+box() 
+  
+points(x = Pseudo.Absence$Long,
+       y = Pseudo.Absence$Lat,
+       col = "grey", pch = 1, cex = 0.75) 
+
+points(x = Cod_Dist$Long, 
+       y = Cod_Dist$Lat, 
+       col = "orange", 
+       pch = 20, 
+       cex = 0.75)
+
+
+testing.group <- 1
+group.presence <- kfold(x = Lat.Long, k = 5)
+head(group.presence)
+table(group.presence)
+
+
+presence.train <- Lat.Long[group.presence != testing.group, ]
+presence.test <- Lat.Long[group.presence == testing.group, ]
+
+# Repeat the process for pseudo-absence points
+group.background <- kfold(x = Pseudo.Absence, k = 5)
+background.train <- Pseudo.Absence[group.background != testing.group, ]
+background.test <- Pseudo.Absence[group.background == testing.group, ]
+
+
+# Build a model using training data
+bc.model <- bioclim(x = env, p = presence.train)
+
+# Predict presence from model (same as previously, but with the update model)
+predict.presence <- dismo::predict(object = bc.model, 
+                                   x = env, 
+                                   ext = geographic.extent)
+
+
+# Use testing data for model evaluation
+bc.eval <- evaluate(p = presence.test,   # The presence testing data
+                    a = background.test, # The absence testing data
+                    model = bc.model,    # The model we are evaluating
+                    x = env)    # Climatic variables for use by model
+
+# Determine minimum threshold for "presence"
+bc.threshold <- threshold(x = bc.eval, stat = "prevalence")
+
+
+
+#Where the 
+plot(Cod.dist.map, 
+     lwd = 0.1,
+     bpal =  colorramp(50), main = "Suitable Habitat for Atlantic Cod", 
+     image = TRUE)
+scaleBathy(Cod.dist.map, deg = 2, x = "topleft", inset = 10)
+
+plot(predict.presence > bc.threshold, add = TRUE, legend = F, col = c(NA, "darkred"))
+points(x = Cod_Dist$Long, 
+       y = Cod_Dist$Lat, 
+       col = "green", 
+       pch = 20, 
+       cex =0.25)
+plot(Cod.dist.map, add = TRUE, border = "chocolate")
+box()
+```
